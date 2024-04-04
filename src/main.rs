@@ -1,4 +1,4 @@
-use std::{fs::File, io::{Read, Write}, process::exit};
+use std::{fs::File, io::Write, process::exit};
 
 use pkg_data::PackageData;
 mod pkg_data;
@@ -20,15 +20,15 @@ fn main() {
     print!("is this data right? (y/n) ");
     let _ = std::io::stdout().flush();
 
-    let mut byte = [0_u8];
-    let _ = std::io::stdin().lock().read_exact(&mut byte);
+    let mut inp = String::new();
+    let _ = std::io::stdin().read_line(&mut inp);
 
-    match byte[0] {
-        b'n' => {
+    match inp.chars().nth(0).unwrap() {
+        'n' => {
             println!("exiting...");
             exit(1);
         },
-        b'y' => {
+        'y' => {
             println!("\x1b[32mcontinuing...\x1b[0m");
         },
         _ => {
@@ -41,8 +41,9 @@ fn main() {
     let _ = std::io::stdout().flush();
 
     let mut inp = String::new();
-    let _ = std::io::stdin().lock().read_to_string(&mut inp);
+    let _ = std::io::stdin().read_line(&mut inp);
 
-    //Install path or smth
+    print!("all done! package is sent for verification to {inp}");
+    exit(0);
 
 }
