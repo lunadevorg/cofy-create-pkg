@@ -1,22 +1,21 @@
-use std::{fs::File, io::Read};
+use std::{fs::read_to_string, path::Path};
 
-use toml::de::Error;
 use serde::Deserialize;
+use toml::de::Error;
 
 #[derive(Deserialize)]
 pub struct PackageData {
     pub author: String,
     pub pkg_name: String,
-    pub version: String   
+    pub version: String,
 }
 
 impl PackageData {
-    pub fn new(mut file: File) -> PackageData {
-        let mut file_str = String::new();
-        let _ = file.read_to_string(&mut file_str);
+    pub fn new(file: &Path) -> Result<PackageData, Box<dyn std::error::Error>> {
+        let file_str = read_to_string(&file)?;
 
-        let res: Result<PackageData, Error> = toml::from_str(&file_str);    
+        let res: Result<PackageData, Error> = toml::from_str(&file_str);
 
-        res.unwrap()
+        Ok(res?)
     }
 }
