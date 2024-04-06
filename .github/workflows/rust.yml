@@ -14,7 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: default to nightly Rust
-      run: rustup update nightly && rustup default nightly
+      run: |
+        rustup update nightly
+        rustup default nightly
+        rustup component add rustfmt clippy
     - name: Build
       run: cargo build --verbose
     - name: Run tests
