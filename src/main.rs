@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         \n\x1b[32mpackage name:\x1b[0m {}\
         \n\x1b[32mversion:\x1b[0m {}\
         \nis this data right? (y/n) ",
-        data.author, data.pkg_name, data.version
+        data.author(), data.pkg_name(), data.version()
     )?;
 
     handle.flush()?;
