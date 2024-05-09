@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use std::{
     io::{self, Write},
     path::Path,
@@ -7,14 +8,14 @@ use std::{
 mod pkg_data;
 use pkg_data::PackageData;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     let file = Path::new("Cofyfile");
     if !file.exists() {
         eprintln!("\x1b[31merror:\x1b[0m cannot find Cofyfile");
         exit(1);
     }
 
-    let data = PackageData::new(file)?;
+    let data = PackageData::new(file).with_context(|| "couldn't read information from Cofyfile")?;
 
     let mut handle = io::stdout().lock();
     write!(
@@ -23,14 +24,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         \n\x1b[32mpackage name:\x1b[0m {}\
         \n\x1b[32mversion:\x1b[0m {}\
         \nis this data right? (y/n) ",
-        data.author(), data.pkg_name(), data.version()
+        data.author(),
+        data.pkg_name(),
+        data.version()
     )?;
 
     handle.flush()?;
 
     loop {
         let mut inp = String::new();
-        io::stdin().read_line(&mut inp)?;
+        io::stdin()
+            .read_line(&mut inp)
+            .with_context(|| "failed to read input")?;
         match inp.trim() {
             "n" | "N" => {
                 println!("exiting...");
@@ -50,7 +55,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     handle.flush()?;
 
     let mut inp = String::new();
-    io::stdin().read_line(&mut inp)?;
+    io::stdin()
+        .read_line(&mut inp)
+        .with_context(|| "failed to read input")?;
 
     print!("all done! package is sent for verification to {inp}");
     Ok(())

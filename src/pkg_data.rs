@@ -1,6 +1,6 @@
-use std::{fs::read_to_string, path::Path};
-
+use anyhow::Result;
 use serde::Deserialize;
+use std::{fs::read_to_string, path::Path};
 
 #[derive(Deserialize)]
 pub struct PackageData {
@@ -11,7 +11,7 @@ pub struct PackageData {
 
 impl PackageData {
     #[inline]
-    pub fn new(file: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new(file: &Path) -> Result<Self> {
         let file_str = read_to_string(file)?;
 
         Ok(toml::from_str(&file_str)?)
