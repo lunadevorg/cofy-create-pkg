@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     let file = Path::new("Cofyfile");
     match file.try_exists() {
         Ok(false) => bail!("Cofyfile doesn't exist"),
-        Err(_) => bail!("Failed to check Cofyfile existance"),
+        Err(err) => bail!("Failed to check Cofyfile existance: {err}"),
         _ => (),
     }
 
