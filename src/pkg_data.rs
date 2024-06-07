@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use serde::Deserialize;
 use std::{fs::read_to_string, path::Path};
 
@@ -12,9 +12,9 @@ pub struct PackageData {
 impl PackageData {
     #[inline]
     pub fn new(file: &Path) -> Result<Self> {
-        let file_str = read_to_string(file)?;
+        let file_str = read_to_string(file).with_context(|| "Failed to read Cofyfile contents")?;
 
-        Ok(toml::from_str(&file_str)?)
+        toml::from_str(&file_str).with_context(|| "Failed to parse Cofyfile data")
     }
 
     #[inline]

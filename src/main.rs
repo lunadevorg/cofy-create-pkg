@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use std::{
     io::{self, Write},
     path::Path,
@@ -10,12 +10,13 @@ use pkg_data::PackageData;
 
 fn main() -> Result<()> {
     let file = Path::new("Cofyfile");
-    if !file.exists() {
-        eprintln!("\x1b[31merror:\x1b[0m cannot find Cofyfile");
-        exit(1);
+    match file.try_exists() {
+        Ok(false) => bail!("Cofyfile doesn't exist"),
+        Err(_) => bail!("Failed to check Cofyfile existance"),
+        _ => (),
     }
 
-    let data = PackageData::new(file).with_context(|| "couldn't read information from Cofyfile")?;
+    let data = PackageData::new(file).with_context(|| "Couldn't read information from Cofyfile")?;
 
     let mut handle = io::stdout().lock();
     write!(
@@ -27,7 +28,8 @@ fn main() -> Result<()> {
         data.author(),
         data.pkg_name(),
         data.version()
-    )?;
+    )
+    .with_context(|| "Failed to write meta information into handle")?;
 
     handle.flush()?;
 
@@ -35,7 +37,7 @@ fn main() -> Result<()> {
         let mut inp = String::new();
         io::stdin()
             .read_line(&mut inp)
-            .with_context(|| "failed to read input")?;
+            .with_context(|| "Failed to read input")?;
         match inp.trim() {
             "n" | "N" => {
                 println!("exiting...");
@@ -51,14 +53,14 @@ fn main() -> Result<()> {
         }
     }
 
-    handle.write_all(b"enter package server: ")?;
+    handle.write_all(b"Enter package server: ")?;
     handle.flush()?;
 
     let mut inp = String::new();
     io::stdin()
         .read_line(&mut inp)
-        .with_context(|| "failed to read input")?;
+        .with_context(|| "Failed to read input")?;
 
-    print!("all done! package is sent for verification to {inp}");
+    print!("All done! package is sent for verification to {inp}");
     Ok(())
 }
